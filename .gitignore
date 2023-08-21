@@ -1,0 +1,16 @@
+.cache/*
+.venv/*
+cloud-config
+
+# secrets
+secrets.*
+
+# ansible
+**/test.yml
+
+# terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+tf_ansible_*
