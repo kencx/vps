@@ -1,0 +1,25 @@
+# Example answer file for setup-alpine script
+# setup-alpine -e -f answerfile
+
+KEYMAPOPTS="us us"
+HOSTNAMEOPTS="-n alpine"
+
+# /etc/network/interfaces
+INTERFACESOPTS="auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+"
+
+DNSOPTS=""
+TIMEZONEOPTS="-z UTC"
+PROXYOPTS="none"
+APKREPOSOPTS="-1"
+
+SSHDOPTS="-c openssh"
+NTPOPTS="-c openntpd"
+
+# disable swap
+DISKOPTS="-m sys -s 0 {{ install_device }}"
+ERASEDDISK="{{ install_device }}"
