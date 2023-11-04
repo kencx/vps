@@ -14,60 +14,20 @@ terraform {
     bucket = "terraform-state"
     key    = "vps/terraform.tfstate"
 
+    endpoints = {
+      s3 = "https://minio.kencv.xyz"
+    }
+
     skip_credentials_validation = true
     skip_region_validation      = true
     skip_metadata_api_check     = true
-    force_path_style            = true
+    use_path_style              = true
+    skip_requesting_account_id  = true
   }
-}
-
-provider "cloudflare" {
-  api_token = var.cloudflare_api_token
 }
 
 provider "hcloud" {
   token = var.vps_hcloud_token
-}
-
-data "cloudflare_accounts" "main" {
-  name = "kenc"
-}
-
-resource "cloudflare_zone" "cheo-dev" {
-  account_id = data.cloudflare_accounts.main.id
-  zone       = "cheo.dev"
-}
-
-resource "cloudflare_record" "ken-cheo-dev" {
-  zone_id = cloudflare_zone.cheo-dev.id
-  name    = "ken"
-  value   = hcloud_server.main.ipv4_address
-  type    = "A"
-  proxied = true
-}
-
-resource "cloudflare_record" "xkcd-cheo-dev" {
-  zone_id = cloudflare_zone.cheo-dev.id
-  name    = "xkcd"
-  value   = hcloud_server.main.ipv4_address
-  type    = "A"
-  proxied = true
-}
-
-resource "cloudflare_record" "resume-cheo-dev" {
-  zone_id = cloudflare_zone.cheo-dev.id
-  name    = "resume"
-  value   = hcloud_server.main.ipv4_address
-  type    = "A"
-  proxied = true
-}
-
-resource "cloudflare_record" "api-cheo-dev" {
-  zone_id = cloudflare_zone.cheo-dev.id
-  name    = "api"
-  value   = hcloud_server.main.ipv4_address
-  type    = "A"
-  proxied = true
 }
 
 resource "hcloud_ssh_key" "main" {
@@ -93,6 +53,12 @@ vps_password: ${var.vps_password}
 vps_timezone: ${var.vps_timezone}
 vps_certbot_email: ${var.vps_certbot_email}
 ${yamlencode({ vps_packages = var.vps_packages })}
+
+fqdn:
+  webhook: ${cloudflare_record.api-cheo-dev.hostname}
+  resume: ${cloudflare_record.resume-cheo-dev.hostname}
+  blog: ${cloudflare_record.ken-cheo-dev.hostname}
+  sxkcd: ${cloudflare_record.xkcd-cheo-dev.hostname}
 EOF
   filename        = "${path.module}/tf_ansible_vars.yml"
   file_permission = "0644"
