@@ -1,0 +1,11 @@
+---
+- name: Update packages
+  apt:
+    update_cache: true
+    cache_valid_time: 86400
+    upgrade: true
+
+- name: Install packages
+  apt:
+    name: "{{ vps_packages }}"
+    state: present
