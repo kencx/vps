@@ -1,4 +1,4 @@
-variable "vps_hcloud_token" {
+variable "hcloud_token" {
   type        = string
   description = "Hetzner API Token"
   sensitive   = true
@@ -35,12 +35,6 @@ variable "vps_timezone" {
   type        = string
   description = "System timezone"
   default     = "Asia/Singapore"
-}
-
-variable "vps_packages" {
-  type        = list(any)
-  description = "List of packages to install"
-  default     = ["git", "curl", "sudo"]
 }
 
 variable "vps_certbot_email" {

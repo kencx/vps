@@ -7,5 +7,17 @@
 
 - name: Install packages
   apt:
-    name: "{{ vps_packages }}"
+    name:
+      - curl
+      - git
+      - make
+      - sudo
+      - vim
+      - lsblk
+      - gnupg
+      - software-properties-common
+      - python3
+      - jq
+      - unzip
+      - ca-certificates
     state: present

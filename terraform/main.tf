@@ -27,7 +27,7 @@ terraform {
 }
 
 provider "hcloud" {
-  token = var.vps_hcloud_token
+  token = var.hcloud_token
 }
 
 resource "hcloud_ssh_key" "main" {
@@ -52,8 +52,6 @@ vps_username: ${var.vps_username}
 vps_password: ${var.vps_password}
 vps_timezone: ${var.vps_timezone}
 vps_certbot_email: ${var.vps_certbot_email}
-${yamlencode({ vps_packages = var.vps_packages })}
-
 fqdn:
   webhook: ${cloudflare_record.api-cheo-dev.hostname}
   resume: ${cloudflare_record.resume-cheo-dev.hostname}

@@ -4,13 +4,27 @@
     update_cache: true
     upgrade: true
 
-- name: Install system packages
-  apk:
-    name:
-      - tzdata
-    state: present
+- name: Write world file
+  copy:
+    content: |
+      alpine-base
+      ca-certificates
+      curl
+      git
+      jq
+      make
+      logrotate
+      lsblk
+      openssh-server
+      python3
+      sudo
+      tzdata
+      vim
+    dest: /etc/apk/world
+    owner: root
+    group: root
+    mode: 0644
 
-- name: Install packages
+- name: Sync world packages
   apk:
-    name: "{{ vps_packages }}"
     state: present
