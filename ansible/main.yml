@@ -64,6 +64,14 @@
         - {name: devfs, level: sysinit}
         - {name: cgroups, level: sysinit}
         - {name: sysfs, level: sysinit}
+        - {name: crond, level: default}
+
+    - name: Schedule logrotate with cron
+      cron:
+        name: logrotate
+        job: "logrotate -log=syslog /etc/logrotate.conf"
+        special_time: daily
+        state: present
 
   roles:
     - name: Security hardening
