@@ -2,6 +2,7 @@
 - hosts: vps
   remote_user: root
   become: true
+  tags: bootstrap
   vars:
     ssh_key: "{{ lookup('file', vps_ssh_public_key_path) }}"
   vars_files:
@@ -82,3 +83,58 @@
 
     - name: Setup webhook
       role: kencx.ansible_collection.webhook
+
+- hosts: vps
+  remote_user: "{{ vps_username }}"
+  become: false
+  tags: apps
+  vars_files:
+    - "../terraform/tf_ansible_vars.yml"
+  vars:
+    apps_dir: "/home/{{ vps_username }}/apps"
+    hooks_dir: "{{ apps_dir }}/hooks"
+
+    certbot_dir: "/etc/letsencrypt"
+    certbot_webroot: "/var/www/certbot"
+    certbot_admin_email: "{{ vps_certbot_email }}"
+
+    sxkcd_image: "ghcr.io/kencx/sxkcd:${SXKCD_TAG:-v0.2.0}"
+    sxkcd_server_name: "{{ fqdn.sxkcd }}"
+    sxkcd_proxy_pass: http://localhost:6380/
+
+    blog_server_name: "{{ fqdn.blog }}"
+    blog_repo: "https://github.com/kencx/source"
+    blog_dir: "{{ apps_dir }}/blog"
+
+    resume_server_name: "{{ fqdn.resume }}"
+
+    webhook_server_name: "{{ fqdn.webhook }}"
+
+  tasks:
+    - name: Create directories
+      file:
+        path: "{{ apps_dir }}/{{ item }}"
+        owner: "{{ vps_username }}"
+        group: "{{ vps_username }}"
+        mode: 0755
+        state: directory
+      with_items:
+        - "nginx/conf.d"
+        - "nginx/snippets"
+        - "hooks"
+        - "sxkcd/data"
+        - "sxkcd/redis"
+
+    - name: Copy docker-compose.yml
+      template:
+        src: "tasks/templates/docker-compose.yml.j2"
+        dest: "{{ apps_dir }}/docker-compose.yml"
+        owner: "{{ vps_username }}"
+        group: "{{ vps_username }}"
+        mode: 0644
+
+    - name: Configure blog
+      import_tasks: ./tasks/blog.yml
+
+    - name: Configure sxkcd server
+      import_tasks: ./tasks/sxkcd.yml

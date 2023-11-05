@@ -1,0 +1,89 @@
+---
+version: '3.6'
+services:
+  cgit:
+    build:
+      context: ./cgit
+      dockerfile: Dockerfile
+    image: kencx/cgit
+    container_name: cgit
+    volumes:
+      - ./cgit/repos:/srv/git
+      - ./cgit/cgit.d:/etc/cgit.d
+      - ./cgit/nginx.conf:/etc/nginx/nginx.conf
+    # ports:
+    #   - 8080:8080
+    networks:
+      - shared
+
+  redis:
+    image: redis/redis-stack-server:6.2.6-v9
+    container_name: redis
+    hostname: redis
+    environment:
+      REDIS_ARGS: --save 20 1 --appendonly yes
+    restart: unless-stopped
+    volumes:
+      - "./sxkcd/redis:/data"
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli", "ping", "|", "grep", "pong"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - sxkcd
+
+  sxkcd:
+    container_name: sxkcd
+    hostname: app
+    image: "{{ sxkcd_image }}"
+    command: ["server", "-p", "6380", "-r", "redis:6379", "-f", "/data/comics.json", "--reindex"]
+    restart: unless-stopped
+    # ports:
+    #   - "6380:6380"
+    volumes:
+      - "./sxkcd/data:/data"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - sxkcd
+      - shared
+
+  nginx:
+    image: nginx:1.25.3-alpine3.18
+    container_name: nginx
+    volumes:
+      - "./nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
+      - "./nginx/snippets:/etc/nginx/snippets:ro"
+      - "./nginx/conf.d:/etc/nginx/conf.d:ro"
+      - "certbot_www:/var/www/certbot:ro"
+      - "certbot_conf:/etc/nginx/ssl:ro"
+      - "./blog/public:/var/www/blog:ro"
+      - "./resume:/var/www/resume:ro"
+    ports:
+      - 80:80
+    depends_on:
+      - sxkcd
+      - cgit
+    networks:
+      - shared
+
+  certbot:
+    image: certbot/certbot:amd64-v2.7.4
+    container_name: certbot
+    volumes:
+      - "certbot_www:/var/www/certbot:rw"
+      - "certbot_conf:/etc/letsencrypt:rw"
+
+volumes:
+  certbot_conf:
+    name: certbot_conf
+  certbot_www:
+    name: certbot_www
+
+networks:
+  shared:
+    name: shared
+  sxkcd:
+    name: sxkcd

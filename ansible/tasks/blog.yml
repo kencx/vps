@@ -1,0 +1,29 @@
+---
+- name: Clone blog source repository
+  git:
+    repo: "{{ blog_repo }}"
+    dest: "{{ blog_dir }}"
+    clone: true
+    force: true
+    update: true
+
+- name: Build blog
+  command:
+    cmd: "./build.sh"
+    chdir: "{{ blog_dir }}/bin"
+    creates: "{{ blog_dir }}/public"
+
+- name: Add publish script
+  copy:
+    content: |
+      #!/bin/sh
+
+      set -e
+
+      cd {{ blog_dir }}
+      git pull --ff-only
+      ./bin/build.sh
+    dest: "{{ hooks_dir }}/publish_blog.sh"
+    owner: "{{ vps_username }}"
+    group: "{{ vps_username }}"
+    mode: 0744

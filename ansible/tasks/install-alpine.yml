@@ -4,27 +4,20 @@
     update_cache: true
     upgrade: true
 
-- name: Write world file
-  copy:
-    content: |
-      alpine-base
-      ca-certificates
-      curl
-      git
-      jq
-      make
-      logrotate
-      lsblk
-      openssh-server
-      python3
-      sudo
-      tzdata
-      vim
-    dest: /etc/apk/world
-    owner: root
-    group: root
-    mode: 0644
-
-- name: Sync world packages
+- name: Install packages
   apk:
+    name:
+      - alpine-base
+      - ca-certificates
+      - curl
+      - git
+      - jq
+      - make
+      - logrotate
+      - lsblk
+      - openssh-server
+      - python3
+      - sudo
+      - tzdata
+      - vim
     state: present

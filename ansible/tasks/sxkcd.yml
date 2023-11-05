@@ -1,0 +1,28 @@
+---
+- name: Download sxkcd data
+  command:
+    cmd: |
+      docker compose run --rm --no-deps sxkcd download -f /data/comics.json
+    chdir: "{{ apps_dir }}"
+    creates: "{{ apps_dir }}/sxkcd/data/comics.json"
+
+- name: Start sxkcd and redis
+  command:
+    cmd: "docker compose up -d sxkcd"
+    chdir: "{{ apps_dir }}"
+
+- name: Add deploy script
+  copy:
+    content: |
+      #!/bin/sh
+
+      set -e
+
+      cd {{ apps_dir }}
+      export SXKCD_TAG="$1"
+      docker compose pull
+      docker compose up -d --force-recreate sxkcd
+    dest: "{{ hooks_dir }}/redeploy_sxkcd.sh"
+    owner: "{{ vps_username }}"
+    group: "{{ vps_username }}"
+    mode: 0744
