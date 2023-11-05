@@ -1,28 +1,20 @@
 packer {
   required_plugins {
     ansible = {
-      version = ">= 1.0.2"
+      version = ">= 1.1.0"
       source  = "github.com/hashicorp/ansible"
     }
     hcloud = {
-      version = ">= 1.0.0"
+      version = ">= 1.1.0"
       source  = "github.com/hashicorp/hcloud"
     }
   }
 }
 
-source "hcloud" "alpine" {
-  image        = "debian-11"
-  location     = "nbg1"
-  rescue       = "linux64"
-  server_type  = "cx11"
-  ssh_username = "root"
-
-  snapshot_labels = {
-    distribution = "alpine"
-    version      = "3.18"
-  }
-  snapshot_name = "alpine-3.18"
+variable "hcloud_token" {
+  type        = string
+  sensitive   = true
+  description = "Hetzner Cloud token"
 }
 
 variable "ssh_public_key_path" {
@@ -33,6 +25,23 @@ variable "ssh_public_key_path" {
 locals {
   alpine_baseurl = "https://dl-cdn.alpinelinux.org/alpine/v3.18"
   alpine_tar     = "${local.alpine_baseurl}/releases/x86_64/alpine-minirootfs-3.18.4-x86_64.tar.gz"
+}
+
+source "hcloud" "alpine" {
+  token = var.hcloud_token
+
+  image        = "debian-11"
+  location     = "nbg1"
+  server_type  = "cx11"
+
+  rescue       = "linux64"
+  ssh_username = "root"
+
+  snapshot_labels = {
+    distribution = "alpine"
+    version      = "3.18"
+  }
+  snapshot_name = "alpine-3.18"
 }
 
 build {

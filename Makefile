@@ -14,3 +14,6 @@ pre-commit:
 
 galaxy.install: requirements.yml
 	ansible-galaxy install -f -r $<
+
+packer.build: alpine/auto.pkrvars.hcl
+	cd alpine && packer build -var-file="auto.pkrvars.hcl" .
