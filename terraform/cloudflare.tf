@@ -48,3 +48,11 @@ resource "cloudflare_record" "api-cheo-dev" {
   type    = "A"
   proxied = true
 }
+
+resource "cloudflare_record" "git-cheo-dev" {
+  zone_id = cloudflare_zone.cheo-dev.id
+  name    = "git"
+  value   = hcloud_server.alpine.ipv4_address
+  type    = "A"
+  proxied = true
+}

@@ -114,10 +114,11 @@
         state: directory
       with_items:
         - "caddy"
-        - "site"
-        # - "hooks"
+        - "cgit"
+        - "site/resume/static"
         - "sxkcd/data"
         - "sxkcd/redis"
+        # - "hooks"
 
     - name: Copy docker-compose.yml
       template:
@@ -129,6 +130,9 @@
 
     - name: Configure sxkcd server
       import_tasks: ./tasks/sxkcd.yml
+
+    - name: Configure cgit
+      import_tasks: ./tasks/cgit.yml
 
     # - name: Configure webhook
     #   import_tasks: ./tasks/webhook.yml

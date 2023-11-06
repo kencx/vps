@@ -19,16 +19,16 @@
     header @static Cache-Control "public, max-age=604800"
 }
 
-# {
-#     git {
-#         repo blog {
-#             base_dir /srv
-#             url {{ blog_repo }}
-#             branch deploy
-#             update every 1800
-#         }
-#     }
-# }
+{
+    git {
+        repo blog {
+            base_dir /srv
+            url {{ blog_repo }}
+            branch deploy
+            update every 1800
+        }
+    }
+}
 
 {{ fqdn.blog }} {
     import static
@@ -80,25 +80,25 @@
 #         close
 #     }
 # }
-#
-# git.cheo.dev {
-#     import static
-#     import common
-#
-#     root * /usr/share/webapps/cgit/
-#     file_server
-#
-#     handle /static/* {
-#         root * /etc/cgit/static
-#         file_server
-#     }
-#
-#     handle {
-#         reverse_proxy cgit:9000 {
-#             transport fastcgi {
-#                 env DOCUMENT_ROOT /usr/share/webapps/cgit/
-#                 env SCRIPT_FILENAME /usr/share/webapps/cgit/cgit.cgi
-#             }
-#         }
-#     }
-# }
+
+{{ fqdn.git }} {
+    import static
+    import common
+
+    root * /usr/share/webapps/cgit/
+    file_server
+
+    handle /static/* {
+        root * /etc/cgit/static
+        file_server
+    }
+
+    handle {
+        reverse_proxy cgit:9000 {
+            transport fastcgi {
+                env DOCUMENT_ROOT /usr/share/webapps/cgit/
+                env SCRIPT_FILENAME /usr/share/webapps/cgit/cgit.cgi
+            }
+        }
+    }
+}

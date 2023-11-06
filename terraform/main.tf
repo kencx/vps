@@ -62,6 +62,7 @@ fqdn:
   resume: ${cloudflare_record.resume-cheo-dev.hostname}
   blog: ${cloudflare_record.ken-cheo-dev.hostname}
   sxkcd: ${cloudflare_record.xkcd-cheo-dev.hostname}
+  git: ${cloudflare_record.git-cheo-dev.hostname}
 EOF
   filename        = "${path.module}/tf_ansible_vars.yml"
   file_permission = "0644"
