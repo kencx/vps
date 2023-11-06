@@ -42,7 +42,7 @@ jobs:
             ghcr.io/${{ github.actor }}/caddy:latest
 
       - name: Build and push cgit
-        # if: steps.filter.outputs.cgit == 'true'
+        if: steps.filter.outputs.cgit == 'true'
         uses: docker/build-push-action@v5
         with:
           context: apps/cgit
@@ -53,7 +53,7 @@ jobs:
             ghcr.io/${{ github.actor }}/cgit:latest
 
       - name: Build and push cgit-nginx
-        # if: steps.filter.outputs.cgit == 'true'
+        if: steps.filter.outputs.cgit == 'true'
         uses: docker/build-push-action@v5
         with:
           context: apps/cgit
