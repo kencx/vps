@@ -1,0 +1,13 @@
+---
+- name: Copy Caddyfile
+  template:
+    src: "tasks/templates/Caddyfile.j2"
+    dest: "{{ apps_dir }}/caddy/Caddyfile"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Start Caddy container
+  command:
+    cmd: "docker compose up -d caddy"
+    chdir: "{{ apps_dir }}"

@@ -37,8 +37,8 @@ variable "vps_timezone" {
   default     = "Asia/Singapore"
 }
 
-variable "vps_certbot_email" {
+variable "vps_letsencrypt_email" {
   type        = string
-  description = "Admin email for certbot"
+  description = "Admin email for Let's Encrypt"
   sensitive   = true
 }

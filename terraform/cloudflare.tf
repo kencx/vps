@@ -20,7 +20,7 @@ resource "cloudflare_zone" "cheo-dev" {
 resource "cloudflare_record" "ken-cheo-dev" {
   zone_id = cloudflare_zone.cheo-dev.id
   name    = "ken"
-  value   = hcloud_server.main.ipv4_address
+  value   = hcloud_server.alpine.ipv4_address
   type    = "A"
   proxied = true
 }
@@ -28,7 +28,7 @@ resource "cloudflare_record" "ken-cheo-dev" {
 resource "cloudflare_record" "xkcd-cheo-dev" {
   zone_id = cloudflare_zone.cheo-dev.id
   name    = "xkcd"
-  value   = hcloud_server.main.ipv4_address
+  value   = hcloud_server.alpine.ipv4_address
   type    = "A"
   proxied = true
 }
@@ -36,7 +36,7 @@ resource "cloudflare_record" "xkcd-cheo-dev" {
 resource "cloudflare_record" "resume-cheo-dev" {
   zone_id = cloudflare_zone.cheo-dev.id
   name    = "resume"
-  value   = hcloud_server.main.ipv4_address
+  value   = hcloud_server.alpine.ipv4_address
   type    = "A"
   proxied = true
 }
@@ -44,7 +44,7 @@ resource "cloudflare_record" "resume-cheo-dev" {
 resource "cloudflare_record" "api-cheo-dev" {
   zone_id = cloudflare_zone.cheo-dev.id
   name    = "api"
-  value   = hcloud_server.main.ipv4_address
+  value   = hcloud_server.alpine.ipv4_address
   type    = "A"
   proxied = true
 }

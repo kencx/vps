@@ -1,0 +1,104 @@
+(common) {
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Frame-Options "DENY"
+        X-Content-Type-Options "nosniff"
+        X-XXS-Protection "0"
+        Referrer-Policy "same-origin"
+        Permissions-Policy "geolocation (), midi (), sync-xhr (), microphone (), camera (), magnetometer (), gyroscope (), speaker (), fullscreen (self), payment ()"
+    }
+
+    encode zstd gzip
+}
+
+(static) {
+    @static {
+        file
+        path *.ico *.css *.js *.gif *.jpg *.jpeg *.png *.svg *.woff
+    }
+    header @static Cache-Control "public, max-age=604800"
+}
+
+# {
+#     git {
+#         repo blog {
+#             base_dir /srv
+#             url {{ blog_repo }}
+#             branch deploy
+#             update every 1800
+#         }
+#     }
+# }
+
+{{ fqdn.blog }} {
+    import static
+    import common
+
+    root * /srv/blog
+    file_server
+
+    try_files {path} {path}/ =404
+
+    handle_errors {
+        rewrite * /404.html
+        file_server
+    }
+}
+
+{{ fqdn.resume }} {
+    import static
+    import common
+
+    root * /srv/resume
+    file_server {
+        index resume.html
+    }
+
+    try_files {path} {path}/ =404
+}
+
+{{ fqdn.sxkcd }} {
+    import static
+    import common
+
+    @methods {
+        method GET HEAD
+    }
+    reverse_proxy @methods sxkcd:6380
+}
+
+# {{ fqdn.webhook }} {
+#     import common
+#
+#     @hooks {
+#         method GET POST HEAD
+#         path /hooks/*
+#     }
+#     reverse_proxy @hooks localhost:9000
+#
+#     respond / "Access Denied" 403 {
+#         close
+#     }
+# }
+#
+# git.cheo.dev {
+#     import static
+#     import common
+#
+#     root * /usr/share/webapps/cgit/
+#     file_server
+#
+#     handle /static/* {
+#         root * /etc/cgit/static
+#         file_server
+#     }
+#
+#     handle {
+#         reverse_proxy cgit:9000 {
+#             transport fastcgi {
+#                 env DOCUMENT_ROOT /usr/share/webapps/cgit/
+#                 env SCRIPT_FILENAME /usr/share/webapps/cgit/cgit.cgi
+#             }
+#         }
+#     }
+# }

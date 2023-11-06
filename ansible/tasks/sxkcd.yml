@@ -10,19 +10,3 @@
   command:
     cmd: "docker compose up -d sxkcd"
     chdir: "{{ apps_dir }}"
-
-- name: Add deploy script
-  copy:
-    content: |
-      #!/bin/sh
-
-      set -e
-
-      cd {{ apps_dir }}
-      export SXKCD_TAG="$1"
-      docker compose pull
-      docker compose up -d --force-recreate sxkcd
-    dest: "{{ hooks_dir }}/redeploy_sxkcd.sh"
-    owner: "{{ vps_username }}"
-    group: "{{ vps_username }}"
-    mode: 0744

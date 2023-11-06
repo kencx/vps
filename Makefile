@@ -17,3 +17,6 @@ galaxy.install: requirements.yml
 
 packer.build: alpine/auto.pkrvars.hcl
 	cd alpine && packer build -var-file="auto.pkrvars.hcl" .
+
+deploy: terraform/terraform.tfvars
+	cd terraform && terraform apply -auto-approve

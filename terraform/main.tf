@@ -35,9 +35,14 @@ resource "hcloud_ssh_key" "main" {
   public_key = file(var.vps_ssh_public_key_path)
 }
 
-resource "hcloud_server" "main" {
-  name        = "web"
-  image       = "debian-11"
+data "hcloud_image" "alpine_snapshot" {
+  with_selector = "distribution=alpine"
+  most_recent   = true
+}
+
+resource "hcloud_server" "alpine" {
+  name        = "alpine"
+  image       = data.hcloud_image.alpine_snapshot.id
   server_type = "cx11"
   location    = "nbg1"
   backups     = false
@@ -47,11 +52,11 @@ resource "hcloud_server" "main" {
 
 resource "local_file" "tf_ansible_vars_file" {
   content         = <<-EOF
-vps_ssh_public_key_path: ${var.vps_ssh_public_key_path}
-vps_username: ${var.vps_username}
-vps_password: ${var.vps_password}
-vps_timezone: ${var.vps_timezone}
-vps_certbot_email: ${var.vps_certbot_email}
+ssh_public_key_path: ${var.vps_ssh_public_key_path}
+username: ${var.vps_username}
+password: ${var.vps_password}
+timezone: ${var.vps_timezone}
+letsencrypt_email: ${var.vps_letsencrypt_email}
 fqdn:
   webhook: ${cloudflare_record.api-cheo-dev.hostname}
   resume: ${cloudflare_record.resume-cheo-dev.hostname}
@@ -65,13 +70,13 @@ EOF
 resource "local_file" "tf_ansible_inventory_file" {
   content         = <<-EOF
 [vps]
-${hcloud_server.main.ipv4_address} ansible_ssh_private_key_file=${var.vps_ssh_private_key_path}
+${hcloud_server.alpine.ipv4_address} ansible_ssh_private_key_file=${var.vps_ssh_private_key_path}
 EOF
   filename        = "${path.module}/tf_ansible_inventory"
   file_permission = "0644"
 }
 
 output "ip_address" {
-  value       = hcloud_server.main.ipv4_address
+  value       = hcloud_server.alpine.ipv4_address
   description = "IP address of endpoint"
 }

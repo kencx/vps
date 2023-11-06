@@ -3,10 +3,10 @@
   remote_user: root
   become: true
   tags: bootstrap
-  vars:
-    ssh_key: "{{ lookup('file', vps_ssh_public_key_path) }}"
   vars_files:
     - "../terraform/tf_ansible_vars.yml"
+  vars:
+    ssh_key: "{{ lookup('file', ssh_public_key_path) }}"
 
   pre_tasks:
     - name: Wait for cloud-init
@@ -24,25 +24,25 @@
 
     - name: Create user
       user:
-        name: "{{ vps_username }}"
+        name: "{{ username }}"
         shell: /bin/sh
         groups: wheel
         append: true
         create_home: true
-        password: "{{ vps_password | password_hash('sha512') }}"
+        password: "{{ password | password_hash('sha512') }}"
         update_password: on_create
         state: present
 
     - name: Add SSH key to new user's authorized_keys
       authorized_key:
-        user: "{{ vps_username }}"
+        user: "{{ username }}"
         key: "{{ ssh_key }}"
-        path: "/home/{{ vps_username }}/.ssh/authorized_keys"
+        path: "/home/{{ username }}/.ssh/authorized_keys"
         state: present
 
     - name: Set timezone
       community.general.timezone:
-        name: "{{ vps_timezone }}"
+        name: "{{ timezone }}"
 
     - name: Enable openrc services (Alpine)
       service:
@@ -56,7 +56,6 @@
         - {name: bootmisc, level: boot}
         - {name: binfmt, level: boot}
         - {name: fsck, level: boot}
-        - {name: urandom, level: boot}
         - {name: root, level: boot}
         - {name: swap, level: boot}
         - {name: localmount, level: boot}
@@ -69,7 +68,7 @@
     - name: Schedule logrotate with cron
       cron:
         name: logrotate
-        job: "logrotate -log=syslog /etc/logrotate.conf"
+        job: "logrotate --log=syslog /etc/logrotate.conf"
         special_time: daily
         state: present
 
@@ -79,57 +78,44 @@
       vars:
         ssh_disable_root_login: true
         ufw_rules:
-          - {rule: 'allow', port: '22', proto: 'tcp', comment: 'ssh'}
           - {rule: 'allow', port: '80', proto: 'tcp', comment: 'http'}
           - {rule: 'allow', port: '443', proto: 'tcp', comment: 'https'}
 
     - name: Install Docker
       role: geerlingguy.docker
       vars:
-        docker_users: ["{{ vps_username }}"]
+        docker_users: ["{{ username }}"]
         docker_compose_package: docker-cli-compose
 
     - name: Setup webhook
       role: kencx.ansible_collection.webhook
 
 - hosts: vps
-  remote_user: "{{ vps_username }}"
+  remote_user: "{{ username }}"
   become: false
   tags: apps
   vars_files:
     - "../terraform/tf_ansible_vars.yml"
   vars:
-    apps_dir: "/home/{{ vps_username }}/apps"
-    hooks_dir: "{{ apps_dir }}/hooks"
-
-    certbot_dir: "/etc/letsencrypt"
-    certbot_webroot: "/var/www/certbot"
-    certbot_admin_email: "{{ vps_certbot_email }}"
-
+    apps_dir: "/home/{{ username }}/apps"
+    # hooks_dir: "{{ apps_dir }}/hooks"
+    blog_repo: "https://github.com/kencx/source.git"
+    # webhook_port: 9000
     sxkcd_image: "ghcr.io/kencx/sxkcd:${SXKCD_TAG:-v0.2.0}"
-    sxkcd_server_name: "{{ fqdn.sxkcd }}"
-    sxkcd_proxy_pass: http://localhost:6380/
-
-    blog_server_name: "{{ fqdn.blog }}"
-    blog_repo: "https://github.com/kencx/source"
-    blog_dir: "{{ apps_dir }}/blog"
-
-    resume_server_name: "{{ fqdn.resume }}"
-
-    webhook_server_name: "{{ fqdn.webhook }}"
+    # sxkcd_webhook_secret: foo
 
   tasks:
     - name: Create directories
       file:
         path: "{{ apps_dir }}/{{ item }}"
-        owner: "{{ vps_username }}"
-        group: "{{ vps_username }}"
+        owner: "{{ username }}"
+        group: "{{ username }}"
         mode: 0755
         state: directory
       with_items:
-        - "nginx/conf.d"
-        - "nginx/snippets"
-        - "hooks"
+        - "caddy"
+        - "site"
+        # - "hooks"
         - "sxkcd/data"
         - "sxkcd/redis"
 
@@ -137,12 +123,15 @@
       template:
         src: "tasks/templates/docker-compose.yml.j2"
         dest: "{{ apps_dir }}/docker-compose.yml"
-        owner: "{{ vps_username }}"
-        group: "{{ vps_username }}"
+        owner: "{{ username }}"
+        group: "{{ username }}"
         mode: 0644
-
-    - name: Configure blog
-      import_tasks: ./tasks/blog.yml
 
     - name: Configure sxkcd server
       import_tasks: ./tasks/sxkcd.yml
+
+    # - name: Configure webhook
+    #   import_tasks: ./tasks/webhook.yml
+
+    - name: Configure caddy
+      import_tasks: ./tasks/caddy.yml
