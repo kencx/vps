@@ -1,14 +1,15 @@
 ---
 version: '3.6'
 services:
-  # cgit:
-  #   image: ghcr.io/kencx/cgit
-  #   container_name: cgit
-  #   volumes:
-  #     - ./cgit/repos:/srv/git
-  #     - ./cgit/cgit.d:/etc/cgit.d
-  #   networks:
-  #     - shared
+  cgit:
+    image: ghcr.io/kencx/cgit:1.2.3-alpine
+    container_name: cgit
+    restart: unless-stopped
+    volumes:
+      - "./cgit/repos:/srv/git"
+      - "./cgit/cgit.d:/etc/cgit.d"
+    networks:
+      - shared
 
   redis:
     image: redis/redis-stack-server:6.2.6-v9
@@ -33,8 +34,6 @@ services:
     image: "{{ sxkcd_image }}"
     command: ["server", "-p", "6380", "-r", "redis:6379", "-f", "/data/comics.json", "--reindex"]
     restart: unless-stopped
-    # ports:
-    #   - "6380:6380"
     volumes:
       - "./sxkcd/data:/data:ro"
     depends_on:
@@ -45,8 +44,7 @@ services:
       - shared
 
   caddy:
-    image: caddy:2.7.5-alpine
-    # image: ghcr.io/kencx/caddy
+    image: ghcr.io/kencx/caddy:2.7.5-alpine
     container_name: caddy
     restart: unless-stopped
     cap_add:
@@ -62,6 +60,7 @@ services:
       - "./site:/srv"
     depends_on:
       - sxkcd
+      - cgit
     networks:
       - shared
 

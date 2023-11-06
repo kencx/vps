@@ -68,3 +68,11 @@ Check the following files before running the playbook:
 - `main.yml` - Replace any variables if necessary
 - `tasks/templates/docker-compose.yml.j2` - the Docker containers to start
 - `tasks/templates/Caddyfile.j2` - the routes to serve
+
+## Docker Builds
+
+Custom Docker images are built in `apps/`:
+
+- `ghcr.io/kencx/caddy` - Custom caddy image with plugins
+- `ghcr.io/kencx/cgit` - Custom cgit image (with and without Nginx)
+    - Custom should be added into `/etc/cgit.d/custom`.
