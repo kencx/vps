@@ -4,6 +4,7 @@ cloud-config
 
 # secrets
 secrets.*
+*.env
 
 # ansible
 **/test.yml
