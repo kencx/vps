@@ -4,8 +4,11 @@ on:
     branches: [master]
 
 jobs:
-  build:
+  filter:
     runs-on: ubuntu-latest
+    outputs:
+      caddy: ${{ steps.filter.outputs.caddy }}
+      cgit: ${{ steps.filter.outputs.cgit }}
     steps:
       - name: Checkout codebase
         uses: actions/checkout@v4
@@ -20,6 +23,10 @@ jobs:
             cgit:
               - 'apps/cgit/**'
 
+  build:
+    runs-on: ubuntu-latest
+    needs: filter
+    steps:
       - name: Login to registry
         uses: docker/login-action@v3
         with:
@@ -31,7 +38,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build and push Caddy
-        if: steps.filter.outputs.caddy == 'true'
+        if: needs.filter.outputs.caddy == 'true'
         uses: docker/build-push-action@v5
         with:
           context: .
