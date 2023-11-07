@@ -1,6 +1,6 @@
 ---
 - name: Copy Caddyfile
-  template:
+  ansible.builtin.template:
     src: "tasks/templates/Caddyfile.j2"
     dest: "{{ apps_dir }}/caddy/Caddyfile"
     owner: "{{ username }}"
@@ -8,6 +8,6 @@
     mode: 0644
 
 - name: Start Caddy container
-  command:
+  ansible.builtin.command:
     cmd: "docker compose up -d caddy"
     chdir: "{{ apps_dir }}"

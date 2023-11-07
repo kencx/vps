@@ -1,11 +1,11 @@
 ---
 - name: Update packages
-  apk:
+  community.general.apk:
     update_cache: true
     upgrade: true
 
 - name: Install packages
-  apk:
+  community.general.apk:
     name:
       - alpine-base
       - ca-certificates

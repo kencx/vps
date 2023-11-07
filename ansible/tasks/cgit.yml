@@ -1,6 +1,6 @@
 ---
 - name: Copy cgit config files
-  template:
+  ansible.builtin.template:
     src: "./tasks/templates/cgit/{{ item }}.j2"
     dest: "{{ apps_dir }}/cgit/config/{{ item }}"
     owner: "{{ username }}"
@@ -12,6 +12,6 @@
     - "style.css"
 
 - name: Start cgit
-  command:
+  ansible.builtin.command:
     cmd: "docker compose up -d cgit"
     chdir: "{{ apps_dir }}"

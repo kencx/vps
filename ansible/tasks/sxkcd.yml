@@ -1,12 +1,12 @@
 ---
 - name: Download sxkcd data
-  command:
+  ansible.builtin.command:
     cmd: |
       docker compose run --rm --no-deps sxkcd download -f /data/comics.json
     chdir: "{{ apps_dir }}"
     creates: "{{ apps_dir }}/sxkcd/data/comics.json"
 
 - name: Start sxkcd and redis
-  command:
+  ansible.builtin.command:
     cmd: "docker compose up -d sxkcd"
     chdir: "{{ apps_dir }}"

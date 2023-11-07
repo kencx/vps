@@ -1,5 +1,6 @@
 ---
-- hosts: vps
+- name: Bootstrap system
+  hosts: vps
   remote_user: root
   become: true
   tags: bootstrap
@@ -10,20 +11,20 @@
 
   pre_tasks:
     - name: Wait for cloud-init
-      command: cloud-init status --wait
+      ansible.builtin.command: cloud-init status --wait
       changed_when: false
       when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
 
     - name: Install packages (Debian)
-      import_tasks: tasks/install-debian.yml
+      ansible.builtin.import_tasks: tasks/install-debian.yml
       when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
 
     - name: Install packages (Alpine)
-      import_tasks: tasks/install-alpine.yml
+      ansible.builtin.import_tasks: tasks/install-alpine.yml
       when: ansible_distribution == "Alpine"
 
     - name: Create user
-      user:
+      ansible.builtin.user:
         name: "{{ username }}"
         shell: /bin/sh
         groups: wheel
@@ -34,7 +35,7 @@
         state: present
 
     - name: Add SSH key to new user's authorized_keys
-      authorized_key:
+      ansible.posix.authorized_key:
         user: "{{ username }}"
         key: "{{ ssh_key }}"
         path: "/home/{{ username }}/.ssh/authorized_keys"
@@ -45,7 +46,7 @@
         name: "{{ timezone }}"
 
     - name: Enable openrc services (Alpine)
-      service:
+      ansible.builtin.service:
         name: "{{ item.name }}"
         runlevel: "{{ item.level }}"
         state: started
@@ -66,7 +67,7 @@
         - {name: crond, level: default}
 
     - name: Schedule logrotate with cron
-      cron:
+      ansible.builtin.cron:
         name: logrotate
         job: "logrotate --log=syslog /etc/logrotate.conf"
         special_time: daily
@@ -90,7 +91,8 @@
     - name: Setup webhook
       role: kencx.ansible_collection.webhook
 
-- hosts: vps
+- name: Configure apps
+  hosts: vps
   remote_user: "{{ username }}"
   become: false
   tags: apps
@@ -106,7 +108,7 @@
 
   tasks:
     - name: Create directories
-      file:
+      ansible.builtin.file:
         path: "{{ apps_dir }}/{{ item }}"
         owner: "{{ username }}"
         group: "{{ username }}"
@@ -121,7 +123,7 @@
         # - "hooks"
 
     - name: Copy docker-compose.yml
-      template:
+      ansible.builtin.template:
         src: "tasks/templates/docker-compose.yml.j2"
         dest: "{{ apps_dir }}/docker-compose.yml"
         owner: "{{ username }}"
@@ -129,13 +131,13 @@
         mode: 0644
 
     - name: Configure sxkcd server
-      import_tasks: ./tasks/sxkcd.yml
+      ansible.builtin.import_tasks: ./tasks/sxkcd.yml
 
     - name: Configure cgit
-      import_tasks: ./tasks/cgit.yml
+      ansible.builtin.import_tasks: ./tasks/cgit.yml
 
     # - name: Configure webhook
-    #   import_tasks: ./tasks/webhook.yml
+    #   ansible.builtin.import_tasks: ./tasks/webhook.yml
 
     - name: Configure caddy
-      import_tasks: ./tasks/caddy.yml
+      ansible.builtin.import_tasks: ./tasks/caddy.yml
