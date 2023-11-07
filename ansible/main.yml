@@ -33,6 +33,7 @@
         password: "{{ password | password_hash('sha512') }}"
         update_password: on_create
         state: present
+      no_log: true
 
     - name: Add SSH key to new user's authorized_keys
       ansible.posix.authorized_key:

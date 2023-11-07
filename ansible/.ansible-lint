@@ -8,8 +8,13 @@ exclude_paths:
   - inventory/
   - ${HOME}/.ansible/roles/
 
+enable_list:
+  - no-log-password
+
 skip_list:
   - no-handler
+  - yaml[line-length]
+  - jinja[spacing]
 
 warn_list:
   - fqcn-builtins
@@ -19,13 +24,15 @@ warn_list:
   - no-relative-paths
   - risky-file-permissions
   - no-changed-when
+  - var-naming[no-role-prefix]
 
 mock_roles:
   - kencx.ansible_collection.security
+  - kencx.ansible_collection.webhook
 
 kinds:
-  - vars: "**/vars.yml"
-  - vars: "**/group_vars/*.yml"
-  - vars: "**/defaults/*.yml"
-  - tasks: "**/tasks/*.yml"
+  - vars: "**/vars.{yml,yaml}"
+  - vars: "**/group_vars/*.{yml,yaml}"
+  - vars: "**/defaults/*.{yml,yaml}"
+  - tasks: "**/tasks/*.{yml,yaml}"
   - playbook: "**/*.{yml,yaml}"

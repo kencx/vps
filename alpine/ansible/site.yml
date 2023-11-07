@@ -1,5 +1,6 @@
 ---
-- hosts: default
+- name: Install alpine
+  hosts: default
   gather_facts: false
   vars:
     interpreter_python: "python3"
@@ -7,67 +8,70 @@
     apk_python_version_identifier: "python3~={{ python_version }}"
 
   tasks:
-    - name: "install {{ apk_python_version_identifier }}"
-      raw: "apk add {{ apk_python_version_identifier }}"
+    - name: "Install {{ apk_python_version_identifier }}"
+      ansible.builtin.raw: "apk add {{ apk_python_version_identifier }}"
 
-    - name: gather ansible facts
-      setup:
+    - name: Gather ansible facts
+      ansible.builtin.setup:
 
     - name: Output disks
-      set_fact:
+      ansible.builtin.set_fact:
         install_device: >-
           /dev/{{ hostvars[inventory_hostname].ansible_devices.keys()
             | map('regex_search', '[sv]da') | select('string')
             | list | first }}
 
     - name: Show chosen disk
-      debug:
+      ansible.builtin.debug:
         var: install_device
 
-    - name: push answerfile
-      template:
+    - name: Push answerfile
+      ansible.builtin.template:
         src: "answerfile.j2"
         dest: "/root/answerfile"
+        owner: root
+        group: root
+        mode: "0644"
 
     # - name: set root password
-    #   user:
+    #   ansible.builtin.user:
     #     name: "root"
     #     password: "password"
 
     - name: Run Alpine installation manually
-      pause:
+      ansible.builtin.pause:
         prompt: |
           "Please SSH into the host and run the installation with \"setup-alpine -e -f /root/answerfile\". Press return to continue once the installation is complete."
 
     - name: Mount installed system
-      mount:
+      ansible.posix.mount:
         state: mounted
-        fstype: "{{item.t}}"
-        opts: "{{item.o | default(omit)}}"
-        src: "{{item.dev}}"
-        path: "{{item.mntpt}}"
+        fstype: "{{ item.t }}"
+        opts: "{{ item.o | default(omit) }}"
+        src: "{{ item.dev }}"
+        path: "{{ item.mntpt }}"
       loop:
-        - {t: "ext4", dev: "{{install_device}}2", mntpt: "/mnt"}
-        - {t: "ext4", dev: "{{install_device}}1", mntpt: "/mnt/boot"}
+        - {t: "ext4", dev: "{{ install_device }}2", mntpt: "/mnt"}
+        - {t: "ext4", dev: "{{ install_device }}1", mntpt: "/mnt/boot"}
         - {t: "proc", dev: "/proc", mntpt: "/mnt/proc"}
         - {t: "devtmpfs", o: "rbind", dev: "/dev", mntpt: "/mnt/dev"}
         - {t: "sysfs", o: "rbind", dev: "/sys", mntpt: "/mnt/sys"}
 
     - name: Add sftp link for ansible sftp
-      file:
+      ansible.builtin.file:
         path: /mnt/usr/lib/sftp-server
         src: ssh/sftp-server
         state: link
 
     - name: Disable ssh password auth
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: "/etc/ssh/sshd_config"
         regexp: "^#?PasswordAuthentication (no|yes)$"
         line: "PasswordAuthentication no"
         validate: "sshd -T -f %s"
 
     - name: Add SSH public key to root user
-      authorized_key:
+      ansible.posix.authorized_key:
         user: root
         path: /mnt/root/.ssh/authorized_keys
         exclusive: true

@@ -43,5 +43,7 @@ repos:
     rev: v6.22.0
     hooks:
       - id: ansible-lint
-        entry: ansible-lint -c ansible/.ansible-lint ansible
+        args: ["-c", "ansible/.ansible-lint", "ansible", "alpine"]
         pass_filenames: false
+        additional_dependencies:
+          - ansible
