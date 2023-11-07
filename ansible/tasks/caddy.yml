@@ -5,7 +5,7 @@
     dest: "{{ apps_dir }}/caddy/Caddyfile"
     owner: "{{ username }}"
     group: "{{ username }}"
-    mode: 0644
+    mode: "0644"
 
 - name: Start Caddy container
   ansible.builtin.command:

@@ -112,7 +112,7 @@
         path: "{{ apps_dir }}/{{ item }}"
         owner: "{{ username }}"
         group: "{{ username }}"
-        mode: 0755
+        mode: "0755"
         state: directory
       with_items:
         - "caddy"
@@ -128,7 +128,7 @@
         dest: "{{ apps_dir }}/docker-compose.yml"
         owner: "{{ username }}"
         group: "{{ username }}"
-        mode: 0644
+        mode: "0644"
 
     - name: Configure sxkcd server
       ansible.builtin.import_tasks: ./tasks/sxkcd.yml
