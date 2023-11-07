@@ -53,16 +53,11 @@ resource "hcloud_server" "alpine" {
 resource "local_file" "tf_ansible_vars_file" {
   content         = <<-EOF
 ssh_public_key_path: ${var.vps_ssh_public_key_path}
-username: ${var.vps_username}
-password: ${var.vps_password}
-timezone: ${var.vps_timezone}
-letsencrypt_email: ${var.vps_letsencrypt_email}
 fqdn:
   webhook: ${cloudflare_record.api-cheo-dev.hostname}
   resume: ${cloudflare_record.resume-cheo-dev.hostname}
   blog: ${cloudflare_record.ken-cheo-dev.hostname}
   sxkcd: ${cloudflare_record.xkcd-cheo-dev.hostname}
-  git: ${cloudflare_record.git-cheo-dev.hostname}
 EOF
   filename        = "${path.module}/tf_ansible_vars.yml"
   file_permission = "0644"

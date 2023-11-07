@@ -6,6 +6,7 @@
   tags: bootstrap
   vars_files:
     - "../terraform/tf_ansible_vars.yml"
+    - "vars.yml"
   vars:
     ssh_key: "{{ lookup('file', ssh_public_key_path) }}"
 
@@ -89,9 +90,6 @@
         docker_users: ["{{ username }}"]
         docker_compose_package: docker-cli-compose
 
-    - name: Setup webhook
-      role: kencx.ansible_collection.webhook
-
 - name: Configure apps
   hosts: vps
   remote_user: "{{ username }}"
@@ -99,13 +97,9 @@
   tags: apps
   vars_files:
     - "../terraform/tf_ansible_vars.yml"
+    - "vars.yml"
   vars:
     apps_dir: "/home/{{ username }}/apps"
-    # hooks_dir: "{{ apps_dir }}/hooks"
-    blog_repo: "https://github.com/kencx/source.git"
-    # webhook_port: 9000
-    sxkcd_image: "ghcr.io/kencx/sxkcd:${SXKCD_TAG:-v0.2.0}"
-    # sxkcd_webhook_secret: foo
 
   tasks:
     - name: Create directories
@@ -121,7 +115,6 @@
         - "site/resume/static"
         - "sxkcd/data"
         - "sxkcd/redis"
-        # - "hooks"
 
     - name: Copy docker-compose.yml
       ansible.builtin.template:
@@ -136,9 +129,6 @@
 
     - name: Configure cgit
       ansible.builtin.import_tasks: ./tasks/cgit.yml
-
-    # - name: Configure webhook
-    #   ansible.builtin.import_tasks: ./tasks/webhook.yml
 
     - name: Configure caddy
       ansible.builtin.import_tasks: ./tasks/caddy.yml

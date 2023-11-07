@@ -19,26 +19,3 @@ variable "vps_ssh_private_key_path" {
   type        = string
   description = "Path to SSH private key"
 }
-
-variable "vps_username" {
-  type        = string
-  description = "Username of VPS user"
-}
-
-variable "vps_password" {
-  type        = string
-  description = "Password of VPS user"
-  sensitive   = true
-}
-
-variable "vps_timezone" {
-  type        = string
-  description = "System timezone"
-  default     = "Asia/Singapore"
-}
-
-variable "vps_letsencrypt_email" {
-  type        = string
-  description = "Admin email for Let's Encrypt"
-  sensitive   = true
-}

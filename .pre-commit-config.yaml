@@ -22,6 +22,7 @@ repos:
         args:
           - --args=-diff
           - --args=-recursive
+        exclude: ^template/
       - id: terraform_validate
 
   - repo: local
@@ -33,11 +34,13 @@ repos:
         entry: ./bin/packer-fmt
         files: (\.pkr\.(hcl|json)|\.pkrvars\.hcl)$
         require_serial: true
+        exclude: ^template/
 
   - repo: https://github.com/gruntwork-io/pre-commit
     rev: v0.1.22
     hooks:
       - id: packer-validate
+        exclude: template/*
 
   - repo: https://github.com/ansible-community/ansible-lint
     rev: v6.22.0

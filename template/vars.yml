@@ -1,0 +1,8 @@
+username: "${USERNAME}"
+password: "${PASSWORD}"
+timezone: "${TIMEZONE}"
+letsencrypt_email: "${EMAIL}"
+blog_repo: "${BLOG_REPOSITORY}"
+sxkcd_image: "${SXKCD_IMAGE}"
+cgit_image: "${CGIT_IMAGE}"
+caddy_image: "${CADDY_IMAGE}"

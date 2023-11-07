@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+ENV_FILE="$ROOT_DIR/.env"
+
+if [[ ! -f "$ENV_FILE" ]]; then
+    echo ".env file missing!"
+    exit 1
+fi
+
+# shellcheck disable=SC2046
+export $(grep -v '^#' "$ENV_FILE" | xargs)
+
+envsubst <"$ROOT_DIR/template/auto.pkrvars.hcl" >"$ROOT_DIR/alpine/auto.pkrvars.hcl"
+envsubst <"$ROOT_DIR/template/terraform.tfvars" >"$ROOT_DIR/terraform/terraform.tfvars"
+envsubst <"$ROOT_DIR/template/vars.yml" >"$ROOT_DIR/ansible/vars.yml"

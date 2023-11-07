@@ -50,6 +50,7 @@ resource "cloudflare_record" "api-cheo-dev" {
 }
 
 resource "cloudflare_record" "git-cheo-dev" {
+  count   = 0
   zone_id = cloudflare_zone.cheo-dev.id
   name    = "git"
   value   = hcloud_server.alpine.ipv4_address

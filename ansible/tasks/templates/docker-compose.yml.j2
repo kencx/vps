@@ -2,7 +2,7 @@
 version: '3.6'
 services:
   cgit:
-    image: ghcr.io/kencx/cgit:1.2.3-alpine
+    image: "{{ cgit_image }}"
     container_name: cgit
     restart: unless-stopped
     volumes:
@@ -44,7 +44,7 @@ services:
       - shared
 
   caddy:
-    image: ghcr.io/kencx/caddy:2.7.5-alpine
+    image: "{{ caddy_image }}"
     container_name: caddy
     restart: unless-stopped
     cap_add:

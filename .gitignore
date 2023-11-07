@@ -6,8 +6,12 @@ cloud-config
 secrets.*
 *.env
 
+# packer
+alpine/auto.pkrvars.hcl
+
 # ansible
 **/test.yml
+ansible/vars.yml
 
 # terraform
 **/.terraform/*
@@ -15,3 +19,5 @@ secrets.*
 *.tfstate.*
 *.tfvars
 tf_ansible_*
+
+!template/*
