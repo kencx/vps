@@ -30,9 +30,9 @@ locals {
 source "hcloud" "alpine" {
   token = var.hcloud_token
 
-  image        = "debian-11"
-  location     = "nbg1"
-  server_type  = "cx11"
+  image       = "debian-11"
+  location    = "nbg1"
+  server_type = "cx11"
 
   rescue       = "linux64"
   ssh_username = "root"
@@ -61,7 +61,7 @@ build {
       "--extra-vars",
       "ssh_public_key_path=${var.ssh_public_key_path}"
     ]
-    user          = "root"
+    user = "root"
     ansible_env_vars = [
       "ANSIBLE_STDOUT_CALLBACK=yaml",
       "ANSIBLE_HOST_KEY_CHECKING=False",

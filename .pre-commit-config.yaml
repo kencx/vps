@@ -29,6 +29,21 @@ repos:
           - --args=-recursive
       - id: terraform_validate
 
+  - repo: local
+    hooks:
+      - id: packer_fmt
+        name: Packer fmt
+        description: Rewrites all Packer files in canonical format
+        language: script
+        entry: ./bin/packer-fmt
+        files: (\.pkr\.(hcl|json)|\.pkrvars\.hcl)$
+        require_serial: true
+
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.19
+    hooks:
+      - id: packer-validate
+
   # - repo: https://github.com/ansible-community/ansible-lint
   #   rev: v6.6.1
   #   hooks:

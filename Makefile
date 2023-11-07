@@ -9,8 +9,8 @@ pip.install: requirements.txt venv
 pre-commit.install: pip.install
 	source .venv/bin/activate && pre-commit install
 
-pre-commit:
-	pre-commit run --all-files
+pre-commit: .pre-commit-config.yaml
+	source .venv/bin/activate && pre-commit run --all-files
 
 galaxy.install: requirements.yml
 	ansible-galaxy install -f -r $<
