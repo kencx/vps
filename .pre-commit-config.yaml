@@ -15,6 +15,11 @@ repos:
     hooks:
       - id: gitleaks-docker
 
+  - repo: https://github.com/acaloiaro/ess.git
+    rev: v2.6.0
+    hooks:
+      - id: ess
+
   - repo: https://github.com/antonbabenko/pre-commit-terraform
     rev: v1.83.5
     hooks:
@@ -40,7 +45,7 @@ repos:
     rev: v0.1.22
     hooks:
       - id: packer-validate
-        exclude: template/*
+        exclude: ^template/
 
   - repo: https://github.com/ansible-community/ansible-lint
     rev: v6.22.0
