@@ -22,10 +22,11 @@
 {
     email {{ letsencrypt_email }}
     git {
-        repo blog {
+        repo source {
             base_dir /srv
             url {{ blog_repo }}
             branch deploy
+            force true
             update every 1800
         }
     }
@@ -35,7 +36,7 @@
     import static
     import common
 
-    root * /srv/blog
+    root * /srv/source
     file_server
 
     try_files {path} {path}/ =404
