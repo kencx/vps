@@ -19,6 +19,16 @@
     header @static Cache-Control "public, max-age=604800"
 }
 
+(logsA) {
+    log {
+        output file /var/log/access.log {
+            roll_size 10mb
+            roll_keep 10
+            roll_keep_for 720h
+        }
+    }
+}
+
 {
     email {{ letsencrypt_email }}
     git {
@@ -35,6 +45,7 @@
 {{ fqdn.blog }} {
     import static
     import common
+    import logsA
 
     root * /srv/source
     file_server
@@ -50,6 +61,7 @@
 {{ fqdn.resume }} {
     import static
     import common
+    import logsA
 
     root * /srv/resume
     file_server {
@@ -62,6 +74,7 @@
 {{ fqdn.sxkcd }} {
     import static
     import common
+    import logsA
 
     @methods {
         method GET HEAD
@@ -69,23 +82,10 @@
     reverse_proxy @methods sxkcd:6380
 }
 
-# {{ fqdn.webhook }} {
-#     import common
-#
-#     @hooks {
-#         method GET POST HEAD
-#         path /hooks/*
-#     }
-#     reverse_proxy @hooks localhost:9000
-#
-#     respond / "Access Denied" 403 {
-#         close
-#     }
-# }
-
 {{ fqdn.git }} {
     import static
     import common
+    import logsA
 
     root * /usr/share/webapps/cgit/
     file_server
