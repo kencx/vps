@@ -111,7 +111,6 @@
         state: directory
       with_items:
         - "caddy"
-        - "cgit"
         - "site/resume/static"
         - "sxkcd/data"
         - "sxkcd/redis"
@@ -126,9 +125,6 @@
 
     - name: Configure sxkcd server
       ansible.builtin.import_tasks: ./tasks/sxkcd.yml
-
-    - name: Configure cgit
-      ansible.builtin.import_tasks: ./tasks/cgit.yml
 
     - name: Configure caddy
       ansible.builtin.import_tasks: ./tasks/caddy.yml
