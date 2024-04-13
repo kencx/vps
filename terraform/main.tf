@@ -54,7 +54,6 @@ resource "local_file" "tf_ansible_vars_file" {
   content         = <<-EOF
 ssh_public_key_path: ${var.vps_ssh_public_key_path}
 fqdn:
-  webhook: ${cloudflare_record.api-cheo-dev.hostname}
   resume: ${cloudflare_record.resume-cheo-dev.hostname}
   blog: ${cloudflare_record.ken-cheo-dev.hostname}
   sxkcd: ${cloudflare_record.xkcd-cheo-dev.hostname}

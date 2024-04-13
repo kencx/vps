@@ -41,14 +41,6 @@ resource "cloudflare_record" "resume-cheo-dev" {
   proxied = true
 }
 
-resource "cloudflare_record" "api-cheo-dev" {
-  zone_id = cloudflare_zone.cheo-dev.id
-  name    = "api"
-  value   = hcloud_server.alpine.ipv4_address
-  type    = "A"
-  proxied = true
-}
-
 resource "cloudflare_record" "git-cheo-dev" {
   count   = 0
   zone_id = cloudflare_zone.cheo-dev.id
